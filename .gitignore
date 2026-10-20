@@ -1,0 +1,16 @@
+node_modules
+dist
+.env
+bot-config.json
+bot-state.json
+bot-logs.json
+bot-profiles.json
+.DS_Store
+remotion-x/node_modules
+remotion-x/build
+remotion-x/out
+remotion-x/public/frames
+bot-live-sessions.json
+bot-live-slots.json
+bot-*.json
+*.tmp

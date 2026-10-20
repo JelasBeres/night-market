@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Night Market · $LAMP</title>
+<meta name="description" content="Night Market: a rainy lantern street where every $LAMP holder runs a stall that grows while they hold.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1a1230;--ink2:#2a1f45;--cream:#fff1d6;--cream2:#e8cfa4;--amber:#ffb340;--gold:#ffc61a;--red:#e8434f;--line:rgba(255,190,110,.45);--mut:#c9b28f;--green:#3ee07a}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#0b0d24;color:var(--cream);font-family:"Baloo 2",system-ui,sans-serif;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#c.drag{cursor:grabbing}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+.panel{background:linear-gradient(180deg,rgba(34,22,58,.9),rgba(20,14,38,.9));border:1.5px solid var(--line);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,220,160,.12);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+button{font:inherit;color:inherit;cursor:pointer}
+#labels,#fx{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.lab{position:absolute;left:0;top:0;white-space:nowrap;display:flex;align-items:center;gap:3px;will-change:transform;font-size:10px;font-weight:700;transition:opacity .25s}
+.lab .ad{font-family:"JetBrains Mono",monospace;font-size:9px;font-weight:500;background:rgba(14,10,28,.82);color:#ffeccc;padding:1px 6px 1px 5px;border-radius:7px;display:flex;align-items:center;gap:4px;border:1px solid rgba(255,200,120,.25)}
+.lab .dt{width:6px;height:6px;border-radius:50%;background:#8a8496;flex:none}
+.lab .dt.on{background:var(--green);box-shadow:0 0 0 2px rgba(62,224,122,.25)}
+.lab .rk{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 4px;border-radius:6px;font-size:10px;font-weight:800;color:#1a1230;border:1.5px solid rgba(20,10,30,.7);box-shadow:0 0 10px rgba(255,200,80,.35)}
+.lab .bs{background:#ffc61a;color:#3a1a00;border-radius:6px;padding:0 5px;font-size:8.5px;letter-spacing:.06em;font-weight:800}
+.lab.stall .ad{background:rgba(40,30,60,.75);border-style:dashed}
+.lab.sold .ad{background:#a32632;color:#fff}
+.lab.far{opacity:0}
+.fl{position:absolute;left:0;top:0;font-weight:800;font-size:15px;white-space:nowrap;will-change:transform;text-shadow:0 2px 0 rgba(0,0,0,.45),0 0 12px rgba(0,0,0,.4)}
+.fl.gold{color:#ffd54a;font-size:13px}
+.fl.burn{color:#ff9a5a;font-size:22px}
+.fl.lv{color:#bff5c9;font-size:12px}
+.fl.clang{color:#fff;font-size:26px;letter-spacing:.04em;font-style:italic}
+.fl.up{color:#ffe7a8;font-size:18px}
+#tl{position:fixed;left:12px;top:12px;width:262px;padding:10px 13px 11px;z-index:3}
+#tl .ttl{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#tl h1{margin:0;font-size:19px;line-height:1;letter-spacing:.04em;font-weight:800;color:#ffe2a8;text-shadow:0 0 14px rgba(255,170,60,.5)}
+#tl h1 b{color:var(--gold)}
+#tl .sub{font-size:10px;color:var(--mut);margin:3px 0 7px;line-height:1.25}
+.tog{border:1px solid var(--line);background:rgba(255,200,120,.08);border-radius:8px;padding:0 7px;font-size:11px;line-height:20px;height:22px;display:none}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.st{background:rgba(255,200,120,.06);border:1px solid rgba(255,200,120,.16);border-radius:9px;padding:4px 8px 3px}
+.st small{display:block;font-size:9px;color:var(--mut);letter-spacing:.04em;text-transform:uppercase;line-height:1.2}
+.st b{font-size:15px;line-height:1.25;color:#fff3dc}
+.up{margin-top:7px}
+.up .h{display:flex;justify-content:space-between;font-size:10px;color:var(--mut)}
+.up .h b{color:#ffe2a8}
+.bar{height:8px;border-radius:5px;background:rgba(255,255,255,.08);margin:4px 0 4px;overflow:hidden;display:flex;gap:2px}
+.bar i{flex:1;background:rgba(255,255,255,.08);border-radius:2px;transition:background .5s}
+.bar i.on{background:linear-gradient(90deg,#ffb340,#ffd86a);box-shadow:0 0 8px rgba(255,190,80,.6)}
+.up .nx{font-size:10.5px;color:#fff1d6;line-height:1.3}
+.up .nx span{color:var(--mut)}
+#lb{position:fixed;right:12px;top:12px;width:250px;padding:9px 11px 8px;z-index:3}
+#lb header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+#lb header b{font-size:13px;color:#ffd86a;letter-spacing:.03em;display:flex;gap:6px;align-items:center}
+#lb ol{list-style:none;margin:0;padding:0}
+#lb li{display:grid;grid-template-columns:22px 1fr auto;gap:7px;align-items:center;font-size:10.5px;padding:3px 2px;border-top:1px dashed rgba(255,200,120,.16);cursor:pointer;border-radius:6px}
+#lb li:hover{background:rgba(255,200,120,.08)}
+#lb li:first-child{border-top:0}
+#lb li .b{display:grid;place-items:center;height:18px;border-radius:5px;font-size:10px;font-weight:800;color:#1a1230}
+#lb li .n{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-family:"JetBrains Mono",monospace;font-size:9.5px}
+#lb li .n small{font-family:"Baloo 2";color:var(--mut);font-size:9.5px;margin-left:5px}
+#lb li .v{color:#ffe2a8;font-size:10px;text-align:right;line-height:1.1}
+#lb li .v small{display:block;font-size:8.5px;color:var(--mut)}
+#lb .foot{font-size:9px;color:var(--mut);border-top:1px solid rgba(255,200,120,.2);margin-top:4px;padding-top:4px;line-height:1.3}
+#ctl{position:fixed;left:50%;transform:translateX(-50%);bottom:40px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;z-index:4;width:max-content;max-width:calc(100vw - 24px)}
+.btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(180deg,#3a2758,#271a40);border:1.5px solid var(--line);border-radius:11px;padding:7px 12px 6px;font-size:12px;font-weight:700;color:#fff1d6;box-shadow:0 4px 0 rgba(0,0,0,.35);white-space:nowrap}
+.btn svg{width:14px;height:14px;flex:none}
+.btn:hover{border-color:#ffc061}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.35)}
+.btn.gold{background:linear-gradient(180deg,#ffcf55,#f0a52a);color:#3a1a00;border-color:#ffe08a}
+.btn.on{background:linear-gradient(180deg,#5a3d86,#3d2862);border-color:#ffd86a}
+.btn[disabled]{opacity:.45;pointer-events:none}
+#tick{position:fixed;left:0;right:0;bottom:0;height:30px;background:rgba(10,7,22,.88);border-top:1px solid var(--line);overflow:hidden;z-index:4;display:flex;align-items:center}
+#tick .tag{flex:none;height:100%;display:flex;align-items:center;padding:0 10px;background:#e8434f;color:#fff;font-weight:800;font-size:11px;letter-spacing:.08em}
+#tick .rail{flex:1;overflow:hidden;position:relative;height:100%}
+#tick .mv{position:absolute;top:0;left:0;height:100%;display:flex;align-items:center;white-space:nowrap;font-size:12px;color:#ffe9c4;animation:mq 46s linear infinite;will-change:transform}
+#tick .mv span{padding-right:60px}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+#pv{position:fixed;left:12px;bottom:40px;font-size:10px;color:#d9c7a6;background:rgba(10,7,22,.7);border:1px solid rgba(255,200,120,.2);padding:2px 8px;border-radius:7px;z-index:3}
+#feed{position:fixed;left:12px;bottom:66px;list-style:none;margin:0;padding:0;display:flex;flex-direction:column-reverse;gap:5px;max-width:300px;z-index:2}
+#feed li{padding:5px 10px;font-size:11px;line-height:1.3;border-radius:10px;animation:sl .3s ease-out}
+#feed li:nth-child(n+3){opacity:.6}
+@keyframes sl{from{transform:translateX(-20px);opacity:0}}
+#toast{position:fixed;left:50%;top:14px;transform:translate(-50%,-12px);padding:8px 16px;font-size:14px;font-weight:800;opacity:0;pointer-events:none;transition:.3s;white-space:nowrap;max-width:calc(100vw - 24px);overflow:hidden;text-overflow:ellipsis;z-index:6;color:#ffe2a8}
+#toast.in{opacity:1;transform:translate(-50%,0)}
+#card{position:fixed;left:50%;bottom:92px;transform:translate(-50%,14px);width:min(330px,calc(100vw - 24px));padding:11px 14px 12px;opacity:0;pointer-events:none;transition:.22s;z-index:6}
+#card.in{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#card h3{margin:0 0 5px;font-size:14px;display:flex;align-items:center;gap:7px;font-family:"JetBrains Mono",monospace}
+#card .row{display:grid;grid-template-columns:96px 1fr;font-size:11.5px;line-height:1.55}
+#card .row span{color:var(--mut)}
+#card .x{position:absolute;right:8px;top:6px;border:0;background:none;font-size:15px;color:var(--mut);width:26px;height:26px}
+#card .tagz{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+#card .tagz i{font-style:normal;font-size:10px;font-weight:700;padding:1px 8px;border-radius:7px;background:rgba(255,200,120,.12);border:1px solid rgba(255,200,120,.25)}
+#cap{position:fixed;left:50%;top:84px;transform:translateX(-50%);padding:9px 16px 10px;text-align:center;z-index:5;display:none;width:min(440px,calc(100vw - 24px))}
+#cap.in{display:block;animation:sl .3s}
+#cap small{display:block;font-size:9.5px;letter-spacing:.12em;color:var(--amber);font-weight:800}
+#cap b{font-size:15px;display:block;line-height:1.25}
+#cap span{font-size:11.5px;color:var(--mut);display:block;line-height:1.3;margin-top:2px}
+#hint{position:fixed;right:12px;bottom:40px;font-size:10px;color:#a99a86;z-index:2;text-align:right}
+/* ───── live edition ───── */
+body.live .demo-only{display:none!important}
+body:not(.live) .live-only{display:none!important}
+body:not(.me) .me-only{display:none!important}
+body.me #bConnect2{display:none!important}
+[hidden]{display:none!important}
+body.live .lab{flex-direction:column;align-items:center;gap:2px}
+#lb li .n .dt{display:inline-block;width:6px;height:6px;border-radius:50%;background:#8a8496;margin-right:5px;vertical-align:1px}
+#lb li .n .dt.on{background:var(--green);box-shadow:0 0 0 2px rgba(62,224,122,.25)}
+#lb li.emp{cursor:default;color:var(--mut)}
+.lab .rw{display:flex;align-items:center;gap:3px}
+.lab .tg{font-family:"Baloo 2",sans-serif;font-size:8.5px;font-weight:700;letter-spacing:.04em;padding:0 5px;border-radius:6px;background:rgba(14,10,28,.7);color:#b9adc4;line-height:14px}
+.lab .tg.on{color:#8ff0b2}
+.lab .tg.vi{color:#cfc4ff}
+.lab .tg.me{background:#ffc61a;color:#3a1a00}
+.lab .bb{order:-1;max-width:190px;white-space:normal;text-align:center;font-size:11px;font-weight:700;line-height:1.25;color:#2a1a0c;background:#fff1d6;border:1.5px solid #ffc061;border-radius:10px;padding:3px 9px 2px;box-shadow:0 3px 0 rgba(0,0,0,.35);display:none;margin-bottom:3px;position:relative}
+.lab .bb.in{display:block;animation:pop .22s ease-out}
+.lab .bb.sp{background:#ffc61a;border-color:#fff1c0}
+.lab .bb::after{content:"";position:absolute;left:50%;bottom:-6px;margin-left:-5px;border:5px solid transparent;border-top-color:#ffc061;border-bottom:0}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+#links{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+#links .btn{padding:4px 9px 3px;font-size:11px;box-shadow:0 3px 0 rgba(0,0,0,.35);text-decoration:none}
+#rc{position:fixed;right:12px;top:12px;width:250px;display:flex;flex-direction:column;gap:8px;z-index:3}
+#rc #lb{position:relative;right:auto;top:auto;width:auto}
+#wallet{padding:9px 11px 10px;font-size:11px}
+#wallet .h{display:flex;align-items:center;gap:6px;font-weight:800;color:#ffe2a8;font-size:12px}
+#wallet .h .dt{width:8px;height:8px;border-radius:50%;background:#8a8496;flex:none}
+#wallet .h .dt.on{background:var(--green);box-shadow:0 0 0 3px rgba(62,224,122,.22)}
+#wallet .h .ch{margin-left:auto;font-size:9px;color:var(--mut);font-weight:600}
+#wallet .m{color:var(--mut);line-height:1.35;margin:4px 0 6px;font-size:10.5px}
+#wallet .m b{color:#fff1d6}
+#wallet .acts{display:flex;gap:5px;flex-wrap:wrap}
+#wallet .acts .btn{padding:5px 10px 4px;font-size:11px}
+#empty{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(380px,calc(100vw - 32px));padding:16px 18px 15px;text-align:center;z-index:5;display:none}
+#empty.in{display:block}
+#empty .k{font-size:10px;letter-spacing:.16em;color:var(--amber);font-weight:800}
+#empty b{display:block;font-size:24px;color:#ffe2a8;line-height:1.15;margin:4px 0 6px;text-shadow:0 0 14px rgba(255,170,60,.45)}
+#empty p{margin:0 0 10px;font-size:12.5px;line-height:1.4;color:#f1dfc0}
+#empty .acts{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+#empty .x{position:absolute;right:8px;top:6px;border:0;background:none;font-size:15px;color:var(--mut);width:26px;height:26px}
+#banner{position:fixed;left:50%;top:62px;transform:translateX(-50%);padding:7px 14px 8px;z-index:5;display:none;text-align:center;width:min(460px,calc(100vw - 24px))}
+#banner.in{display:block;animation:sl .3s}
+#banner small{display:block;font-size:9.5px;letter-spacing:.12em;color:var(--amber);font-weight:800}
+#banner b{display:block;font-size:14px;line-height:1.3}
+#chatbox{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);display:none;gap:6px;z-index:6;width:min(420px,calc(100vw - 24px));padding:6px}
+#chatbox.in{display:flex}
+#chatbox input{flex:1;min-width:0;font:inherit;font-size:13px;color:#fff1d6;background:rgba(10,7,22,.8);border:1px solid var(--line);border-radius:9px;padding:6px 10px;outline:none;-webkit-user-select:text;user-select:text}
+#chatbox input:focus{border-color:#ffc061}
+#chatbox .note{position:absolute;left:8px;right:8px;bottom:100%;margin-bottom:4px;font-size:10px;color:#e9d6b4;text-align:center;text-shadow:0 1px 2px #000}
+#joy{position:fixed;left:18px;bottom:92px;width:108px;height:108px;border-radius:50%;background:rgba(20,14,38,.45);border:1.5px solid rgba(255,190,110,.35);z-index:4;display:none;touch-action:none}
+#joy i{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:linear-gradient(180deg,#ffcf55,#f0a52a);box-shadow:0 3px 0 rgba(0,0,0,.35);opacity:.85}
+body.me.touch #joy{display:block}
+#ctl .ico{padding:7px 9px 6px}
+#ctl .sep{width:1px;background:rgba(255,190,110,.3);margin:2px 2px}
+.btn.green{background:linear-gradient(180deg,#46d67f,#23a65a);color:#08240f;border-color:#a9f5c4}
+#loading{position:fixed;inset:0;display:grid;place-items:center;background:#0b0d24;z-index:30;transition:opacity .6s;font-weight:700;color:#ffd86a;letter-spacing:.1em}
+@media (max-width:720px){
+  #tl{width:auto;right:12px;max-width:none;padding:8px 11px 9px}
+  #tl h1{font-size:16px}
+  #tl .sub{display:none}
+  .tog{display:inline-block}
+  #tl.min .body{display:none}
+  .stats{grid-template-columns:repeat(4,1fr);gap:4px}
+  .st{padding:3px 5px 2px}.st small{font-size:7.5px}.st b{font-size:12px}
+  #lb{top:auto;bottom:152px;right:12px;width:230px}
+  #lb.min{bottom:124px}
+  #lb.min ol,#lb.min .foot{display:none}
+  #lb.min{width:auto;padding:5px 9px}
+  #lb.min header{margin:0}
+  #ctl{bottom:38px;gap:5px}
+  .btn{padding:6px 9px 5px;font-size:11px}
+  .btn .lg{display:none}
+  #feed{display:none}
+  #pv{bottom:auto;top:auto;left:12px;bottom:128px;font-size:9px}
+  #hint{display:none}
+  #card{bottom:128px}
+  #cap{top:auto;bottom:178px}
+  #rc{top:auto;bottom:86px;width:auto;max-width:200px;align-items:flex-end}
+  #rc #lb{bottom:auto;width:230px}
+  #rc #lb.min{bottom:auto;width:auto}
+  #wallet{padding:6px 9px 7px;width:200px}
+  #wallet .m{display:none}
+  body.me #wallet .acts{display:none}
+  #banner{top:auto;bottom:250px}
+  #chatbox{bottom:80px}
+  #ctl .ico{padding:7px 8px 6px}
+  #ctl .sep{display:none}
+  #links .btn{font-size:10px;padding:3px 7px 2px}
+  body.live #tl .sub{display:none}
+}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="labels"></div><div id="fx"></div>
+<div id="loading">LIGHTING THE LANTERNS…</div>
+<section id="tl" class="panel">
+  <div class="ttl"><h1>NIGHT MARKET · <b>$LAMP</b></h1><button class="tog" id="tlTog" aria-label="toggle stats">–</button></div>
+  <div class="body">
+    <div class="sub">Hold 100K $LAMP, get a stall. It grows while you hold.</div>
+    <div class="stats">
+      <div class="st"><small>Open stalls</small><b id="sOpen">0</b></div>
+      <div class="st"><small>Shutters down</small><b id="sShut">0</b></div>
+      <div class="st"><small>Burned</small><b id="sBurn">0%</b></div>
+      <div class="st"><small>To the guild</small><b id="sShare">0</b></div>
+    </div>
+    <div class="up">
+      <div class="h"><span>Street upgrades</span><b id="uCount">0 / 5</b></div>
+      <div class="bar" id="uBar"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="nx" id="uNext"></div>
+    </div>
+    <div id="links" class="live-only">
+      <a class="btn gold" id="lBuy" target="_blank" rel="noreferrer" hidden>Buy $LAMP</a>
+      <button class="btn" id="lCa" hidden></button>
+      <a class="btn" id="lExp" target="_blank" rel="noreferrer" hidden>Explorer</a>
+      <a class="btn" id="lX" target="_blank" rel="noreferrer"><svg viewBox="0 0 16 16"><path d="M2 2h3.4l3 4.2L12 2h1.8L9.3 7.4 14 14h-3.4L7.4 9.6 3.6 14H1.8l4.8-5.6z" fill="currentColor"/></svg>Follow on X</a>
+    </div>
+  </div>
+</section>
+<div id="rc">
+<section id="lb" class="panel">
+  <header><b><svg width="12" height="14" viewBox="0 0 12 14"><rect x="4" y="0" width="4" height="2" fill="#ffd86a"/><ellipse cx="6" cy="7.5" rx="5.5" ry="5" fill="#ffc61a"/><rect x="2" y="7" width="8" height="1" fill="#b4560f"/><rect x="4.5" y="12" width="3" height="2" fill="#ffd86a"/></svg>Golden Lantern Guild</b><button class="tog" id="lbTog" aria-label="toggle guild">–</button></header>
+  <ol id="lbList"></ol>
+  <div class="foot">Top 10 by balance. 35% of each engine round buys $LAMP for them, split by balance (held 10 min+ only).</div>
+</section>
+<section id="wallet" class="panel live-only">
+  <div class="h"><i class="dt" id="wDot"></i><span id="wSt">Wallet not connected</span><span class="ch">Robinhood Chain</span></div>
+  <div class="m" id="wMsg">Connect to walk the market. Holders of 100K $LAMP get a stall of their own; anyone else walks in as a visitor. No signature needed to walk.</div>
+  <div class="acts" id="wActs"><button class="btn gold" id="bConnect">Connect wallet</button></div>
+</section>
+</div>
+<ul id="feed"></ul>
+<div id="pv" class="demo-only">preview · sample vendors, not real wallets</div>
+<div id="hint"><span class="demo-only">drag to orbit · right-drag / two fingers to pan · wheel to zoom · click a stall</span><span class="live-only" id="hintLive">drag to orbit · wheel to zoom · click a stall or a vendor</span></div>
+<div id="ctl">
+  <button class="btn gold demo-only" id="bRound"><svg viewBox="0 0 16 16"><path d="M8 1l1.6 4.4L14 6l-3.4 2.9L11.6 14 8 11.5 4.4 14l1-5.1L2 6l4.4-.6z" fill="currentColor"/></svg>Run an engine round</button>
+  <button class="btn demo-only" id="bSell"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="3" rx="1" fill="currentColor"/><path d="M3 6h10v8H3z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3 8.5h10M3 11h10" stroke="currentColor"/></svg>Someone sells<span class="lg">&nbsp;(shutter)</span></button>
+  <button class="btn demo-only" id="bBuy"><svg viewBox="0 0 16 16"><circle cx="4" cy="13" r="2" fill="currentColor"/><circle cx="12" cy="13" r="2" fill="currentColor"/><path d="M2 11V6h7l3 3h2v2z" fill="currentColor"/></svg>Someone buys<span class="lg">&nbsp;(new stall)</span></button>
+  <button class="btn demo-only" id="bSpeed"><svg viewBox="0 0 16 16"><path d="M2 3l6 5-6 5zM8 3l6 5-6 5z" fill="currentColor"/></svg><span id="speedT">Speed up time</span></button>
+  <button class="btn gold live-only" id="bConnect2"><svg viewBox="0 0 16 16"><rect x="1.5" y="4" width="13" height="9" rx="2" fill="currentColor"/><rect x="10" y="7" width="5" height="3" rx="1" fill="#3a1a00"/><path d="M3 4l7-2.5 1 2.5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>Connect wallet</button>
+  <button class="btn ico live-only me-only" data-emo="wave" title="Wave (1)"><svg viewBox="0 0 16 16"><path d="M5 14V7.5a1 1 0 0 1 2 0V3a1 1 0 0 1 2 0v4-5a1 1 0 0 1 2 0v5.5-3a1 1 0 0 1 2 0V10c0 2.5-1.8 4-4 4z" fill="currentColor"/></svg><span class="lg">Wave</span></button><button class="btn ico live-only me-only" data-emo="dance" title="Dance (2)"><svg viewBox="0 0 16 16"><circle cx="8" cy="2.6" r="1.6" fill="currentColor"/><path d="M8 5l-3 2 1 1 2-1 .2 3L5 14h1.8l2.2-3 2 3h1.8l-2.6-4.2L10 7l2.6-1.6-.8-1.2z" fill="currentColor"/></svg><span class="lg">Dance</span></button><button class="btn ico live-only me-only" data-emo="jump" title="Jump (3)"><svg viewBox="0 0 16 16"><path d="M8 1l4 4H9.5v4h-3V5H4z" fill="currentColor"/><rect x="3" y="12" width="10" height="2" rx="1" fill="currentColor"/></svg><span class="lg">Jump</span></button><button class="btn ico live-only me-only" data-emo="punch" title="Punch (4)"><svg viewBox="0 0 16 16"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h6A2.5 2.5 0 0 1 13 7.5v2A3.5 3.5 0 0 1 9.5 13h-4A2.5 2.5 0 0 1 3 10.5z" fill="currentColor"/><path d="M5 5v3M7.5 5v3M10 5v3" stroke="#271a40" stroke-width="1"/></svg><span class="lg">Punch</span></button><button class="btn ico live-only me-only" data-emo="hug" title="Hug (5)"><svg viewBox="0 0 16 16"><path d="M8 14s-5.5-3.3-5.5-7.2A3 3 0 0 1 8 4.6a3 3 0 0 1 5.5 2.2C13.5 10.7 8 14 8 14z" fill="currentColor"/></svg><span class="lg">Hug</span></button><button class="btn ico live-only me-only" data-emo="hi5" title="High five (6)"><svg viewBox="0 0 16 16"><path d="M4 15V8.5a1 1 0 0 1 2 0V2.8a1 1 0 0 1 2 0V7-1a1 1 0 0 1 2 0v6-3.5a1 1 0 0 1 2 0V11c0 2.4-1.6 4-4 4z" fill="currentColor"/><path d="M13 1.5l1.5-1M14.2 3.6l1.6-.2" stroke="currentColor" stroke-width="1.2"/></svg><span class="lg">High five</span></button>
+  <i class="sep live-only me-only"></i>
+  <button class="btn ico live-only me-only" id="bChat" title="Chat (Enter)"><svg viewBox="0 0 16 16"><path d="M2 3.5A1.5 1.5 0 0 1 3.5 2h9A1.5 1.5 0 0 1 14 3.5v6a1.5 1.5 0 0 1-1.5 1.5H7l-3.5 3V11h0A1.5 1.5 0 0 1 2 9.5z" fill="currentColor"/></svg><span class="lg">Chat</span></button>
+  <button class="btn ico live-only me-only" id="bSpeech" hidden title="Announcement (No.1 or No.2)"><svg viewBox="0 0 16 16"><path d="M2 6.5h2.5L11 3v10L4.5 9.5H2z" fill="currentColor"/><path d="M5 9.8L6.2 14h1.6L7 10.4" fill="currentColor"/><path d="M12.8 5.5a3.5 3.5 0 0 1 0 5" stroke="currentColor" stroke-width="1.3" fill="none"/></svg><span class="lg" id="bSpeechT">Announce</span></button>
+  <button class="btn ico live-only me-only" id="bFind" title="Back to my vendor"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="8" r="1.8" fill="currentColor"/><path d="M8 0v3M8 13v3M0 8h3M13 8h3" stroke="currentColor" stroke-width="1.6"/></svg><span class="lg">Find me</span></button>
+  <button class="btn demo-only" id="bTour"><svg viewBox="0 0 16 16"><path d="M4 2l10 6-10 6z" fill="currentColor"/></svg><span id="tourT">Tour</span></button>
+</div>
+<div id="chatbox" class="panel"><div class="note" id="chatNote">Chat asks for one free signature the first time. It moves no funds.</div><input id="chatIn" maxlength="80" placeholder="Say something to the market" autocomplete="off" enterkeyhint="send"><button class="btn gold" id="chatGo">Send</button></div>
+<div id="joy"><i></i></div>
+<div id="banner" class="panel"><small id="bnS">ANNOUNCEMENT AT THE STAGE</small><b id="bnB"></b></div>
+<div id="empty" class="panel live-only"><button class="x" id="emX" aria-label="close">×</button><div class="k">NIGHT MARKET</div><b id="emT">Coming soon</b><p id="emS">$LAMP launches on Pons. Hold 100K $LAMP or more and you get a stall on this street, one that grows every 10 minutes you hold.</p><div class="acts"><a class="btn gold" id="emBuy" target="_blank" rel="noreferrer" hidden>Buy $LAMP</a><a class="btn" id="emXl" target="_blank" rel="noreferrer">Follow on X for the CA</a></div></div>
+<div id="tick"><div class="tag">RULES</div><div class="rail"><div class="mv" id="mv"></div></div></div>
+<div id="toast" class="panel"></div>
+<div id="cap" class="panel"><small id="capS"></small><b id="capB"></b><span id="capT"></span></div>
+<div id="card" class="panel"><button class="x" id="cardX" aria-label="close">×</button><h3 id="cardH"></h3><div id="cardB"></div></div>
+<script type="module" src="./src/market.js"></script>
+</body>
+</html>

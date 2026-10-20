@@ -1,0 +1,26 @@
+{
+  "name": "night-market",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5370 --strictPort",
+    "build": "vite build",
+    "check": "tsc -p tsconfig.bot.json",
+    "preview": "vite preview --port 5370",
+    "bot": "tsx bot/town-engine.ts",
+    "live": "tsx bot/town-live.ts"
+  },
+  "dependencies": {
+    "ethers": "^6.17.0",
+    "three": "^0.186.1",
+    "tsx": "^4.23.15",
+    "ws": "^8.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/ws": "^8.18.2",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4"
+  }
+}
